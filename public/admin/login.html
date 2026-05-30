@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin - CMS Jurusan Telkom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-body">
+    <div class="login-container">
+        <div class="login-left">
+            <div class="login-illustration">
+                <!-- SVG Illustration Placeholder -->
+                <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="200" cy="150" r="100" fill="rgba(255,255,255,0.1)" />
+                    <rect x="120" y="100" width="160" height="100" rx="10" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="2"/>
+                    <circle cx="150" cy="150" r="15" fill="#e53e3e" class="pulse"/>
+                    <circle cx="200" cy="150" r="15" fill="#1dd1a1" class="pulse" style="animation-delay: 0.5s"/>
+                    <circle cx="250" cy="150" r="15" fill="#feca57" class="pulse" style="animation-delay: 1s"/>
+                </svg>
+            </div>
+            <h2>Sistem Manajemen Konten</h2>
+            <p>Kelola seluruh konten website Jurusan Telkom SMK Karya Nugraha Boyolali dengan mudah dan cepat melalui satu pintu.</p>
+        </div>
+        <div class="login-right">
+            <div class="login-form-box glass-panel">
+                <div class="logo">
+                    <h3>Admin<span class="highlight">Panel</span></h3>
+                </div>
+                <h4>Selamat Datang Kembali!</h4>
+                <p class="subtitle">Silakan masuk ke akun Anda.</p>
+                
+                <form id="loginForm" action="index.html">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="admin@smkknboyolali.sch.id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                    <div class="form-options">
+                        <label class="remember">
+                            <input type="checkbox"> Ingat saya
+                        </label>
+                        <a href="#" class="forgot-link">Lupa Password?</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Masuk Dashboard</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="js/script.js?v=2"></script>
+</body>
+</html>

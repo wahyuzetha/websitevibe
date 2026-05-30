@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - CMS Jurusan Telkom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=3">
+</head>
+<body>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Perubahan berhasil disimpan!</div>
+    <div id="loading" class="loading-overlay d-none"><div class="spinner"></div></div>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Admin<span class="highlight">Panel</span></h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-label">Main Menu</li>
+                <li><a href="#" class="nav-link active" data-target="dashboard">📊 Dashboard</a></li>
+                
+                <li class="menu-label">Edit Homepage</li>
+                <li><a href="#" class="nav-link" data-target="edit-hero">🎨 Edit Hero Section</a></li>
+                <li><a href="#" class="nav-link" data-target="edit-tentang">ℹ️ Edit Tentang Jurusan</a></li>
+                <li><a href="#" class="nav-link" data-target="edit-keunggulan">⭐ Edit Keunggulan</a></li>
+                <li><a href="#" class="nav-link" data-target="edit-statistik">📈 Edit Statistik</a></li>
+                <li><a href="#" class="nav-link" data-target="edit-galeri">🖼️ Edit Galeri</a></li>
+                <li><a href="#" class="nav-link" data-target="edit-karier">💼 Edit Karier</a></li>
+                <li><a href="#" class="nav-link" data-target="edit-testimoni">💬 Edit Testimoni</a></li>
+                <li><a href="#" class="nav-link" data-target="edit-faq">❓ Edit FAQ</a></li>
+                <li><a href="#" class="nav-link" data-target="edit-materi">📚 Materi Pembelajaran</a></li>
+                
+                <li class="menu-label">Sistem</li>
+                <li><a href="#" class="nav-link" data-target="settings">⚙️ Pengaturan Website</a></li>
+                <li><a href="login.html" class="nav-link logout-btn">🚪 Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Navbar Atas -->
+            <header class="topbar">
+                <div class="search-bar">
+                    <span>🔍</span>
+                    <input type="text" placeholder="Cari menu atau konten...">
+                </div>
+                <div class="topbar-actions">
+                    <button id="theme-toggle" class="icon-btn" title="Toggle Dark Mode">🌙</button>
+                    <button class="icon-btn" title="Notifikasi">🔔</button>
+                    <div class="profile-menu">
+                        <div class="avatar">A</div>
+                        <span>Admin Telkom</span>
+                    </div>
+                    <button class="btn btn-outline logout-btn" style="color: #ef4444; border-color: #ef4444; margin-left: 10px;">🚪 Keluar</button>
+                </div>
+            </header>
+
+            <!-- Global Actions -->
+            <div class="global-actions">
+                <div class="status-indicator">
+                    <span class="dot green"></span> Status: Sinkron dengan Database
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-outline" id="btn-preview" onclick="window.open('/', '_blank')">👁️ Preview Website</button>
+                    <button class="btn btn-primary btn-save-all">🚀 Publish / Simpan Semua</button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                
+                <!-- SECTION: DASHBOARD -->
+                <section id="dashboard" class="content-section active">
+                    <h2 class="section-title">Dashboard Utama</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon blue">👁️</div>
+                            <div class="stat-info">
+                                <h3>12.500</h3>
+                                <p>Total Pengunjung</p>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon red">🖼️</div>
+                            <div class="stat-info">
+                                <h3>24</h3>
+                                <p>Total Foto Galeri</p>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon yellow">💬</div>
+                            <div class="stat-info">
+                                <h3>18</h3>
+                                <p>Total Testimoni</p>
+                            </div>
+                        </div>
+                        <div class="stat-card glass-panel">
+                            <div class="stat-icon green">❓</div>
+                            <div class="stat-info">
+                                <h3>8</h3>
+                                <p>Item FAQ</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION: EDIT HERO -->
+                <section id="edit-hero" class="content-section d-none">
+                    <div class="section-header">
+                        <h2 class="section-title">Edit Hero Section</h2>
+                        <button class="btn btn-primary btn-save-all">Simpan Perubahan</button>
+                    </div>
+                    <div class="form-card glass-panel">
+                        <div class="form-group">
+                            <label>Judul Utama</label>
+                            <input type="text" id="hero_title" class="form-control auto-save db-setting">
+                        </div>
+                        <div class="form-group">
+                            <label>Subjudul (Deskripsi)</label>
+                            <textarea id="hero_subtitle" class="form-control auto-save db-setting" rows="3"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Teks Tombol 1 (Primary)</label>
+                                <input type="text" id="hero_btn1" class="form-control auto-save db-setting">
+                            </div>
+                            <div class="form-group">
+                                <label>Teks Tombol 2 (Secondary)</label>
+                                <input type="text" id="hero_btn2" class="form-control auto-save db-setting">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION: EDIT TENTANG -->
+                <section id="edit-tentang" class="content-section d-none">
+                    <div class="section-header">
+                        <h2 class="section-title">Edit Tentang Jurusan</h2>
+                        <button class="btn btn-primary btn-save-all">Simpan Perubahan</button>
+                    </div>
+                    <div class="form-card glass-panel">
+                        <div class="form-group">
+                            <label>Deskripsi Jurusan</label>
+                            <textarea id="tentang_desc" class="form-control auto-save db-setting" rows="4"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>List Pembelajaran (Pisahkan dengan koma)</label>
+                            <input type="text" id="tentang_list" class="form-control auto-save db-setting">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION: EDIT KEUNGGULAN -->
+                <section id="edit-keunggulan" class="content-section d-none">
+                    <div class="section-header">
+                        <h2 class="section-title">Edit Keunggulan</h2>
+                        <button class="btn btn-outline">+ Tambah Card</button>
+                    </div>
+                    <div class="cards-manager" id="advantages-list">
+                        <!-- Rendered by JS -->
+                    </div>
+                </section>
+
+                <!-- SECTION: EDIT STATISTIK -->
+                <section id="edit-statistik" class="content-section d-none">
+                    <div class="section-header">
+                        <h2 class="section-title">Edit Statistik</h2>
+                        <button class="btn btn-primary btn-save-all">Simpan Perubahan</button>
+                    </div>
+                    <div class="form-card glass-panel">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Label 1</label>
+                                <input type="text" id="stat1_label" class="form-control auto-save db-setting">
+                                <label>Angka 1</label>
+                                <input type="number" id="stat1_val" class="form-control auto-save db-setting">
+                            </div>
+                            <div class="form-group">
+                                <label>Label 2</label>
+                                <input type="text" id="stat2_label" class="form-control auto-save db-setting">
+                                <label>Angka 2</label>
+                                <input type="number" id="stat2_val" class="form-control auto-save db-setting">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Label 3</label>
+                                <input type="text" id="stat3_label" class="form-control auto-save db-setting">
+                                <label>Angka 3</label>
+                                <input type="number" id="stat3_val" class="form-control auto-save db-setting">
+                            </div>
+                            <div class="form-group">
+                                <label>Label 4</label>
+                                <input type="text" id="stat4_label" class="form-control auto-save db-setting">
+                                <label>Angka 4</label>
+                                <input type="number" id="stat4_val" class="form-control auto-save db-setting">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION: EDIT GALERI -->
+                <section id="edit-galeri" class="content-section d-none">
+                    <div class="section-header">
+                        <h2 class="section-title">Edit Galeri</h2>
+                    </div>
+                    <div class="form-card glass-panel mb-2">
+                        <h3>Tambah Gambar Baru</h3>
+                        <form id="upload-gallery-form" class="form-row mt-1">
+                            <div class="form-group" style="flex: 2;">
+                                <label>Pilih Gambar</label>
+                                <input type="file" id="gallery_image" class="form-control" accept="image/*" required>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Judul / Caption</label>
+                                <input type="text" id="gallery_title" class="form-control" placeholder="Contoh: Praktik Lab">
+                            </div>
+                            <div class="form-group" style="flex: 0.5; display: flex; align-items: flex-end;">
+                                <button type="submit" class="btn btn-primary w-100">Upload</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="gallery-grid" id="gallery-list">
+                        <!-- Rendered by JS -->
+                    </div>
+                </section>
+                
+                <!-- SECTION: EDIT KARIER -->
+                <section id="edit-karier" class="content-section d-none">
+                    <div class="section-header">
+                        <h2 class="section-title">Edit Prospek Karier</h2>
+                        <button class="btn btn-outline">+ Tambah Karier</button>
+                    </div>
+                    <div class="cards-manager" id="careers-list">
+                    </div>
+                </section>
+
+                <!-- SECTION: EDIT TESTIMONI -->
+                <section id="edit-testimoni" class="content-section d-none">
+                    <div class="section-header">
+                        <h2 class="section-title">Edit Testimoni</h2>
+                        <button class="btn btn-outline">+ Tambah Testimoni</button>
+                    </div>
+                    <div class="cards-manager" id="testimonials-list">
+                    </div>
+                </section>
+
+                <!-- SECTION: EDIT FAQ -->
+                <section id="edit-faq" class="content-section d-none">
+                    <div class="section-header">
+                        <h2 class="section-title">Edit FAQ</h2>
+                        <button class="btn btn-outline">+ Tambah FAQ</button>
+                    </div>
+                    <div class="cards-manager" id="faqs-list">
+                    </div>
+                </section>
+
+                <!-- SECTION: EDIT MATERI -->
+                <section id="edit-materi" class="content-section d-none">
+                    <div class="section-header">
+                        <h2 class="section-title">Edit Materi Pembelajaran</h2>
+                    </div>
+                    <div class="form-card glass-panel mb-2">
+                        <h3>Tambah Materi Baru</h3>
+                        <form id="upload-materi-form" class="mt-1">
+                            <div class="form-group">
+                                <label>Judul Materi</label>
+                                <input type="text" id="materi_title" class="form-control" placeholder="Contoh: Modul Jaringan Dasar" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Isi Materi / Deskripsi Singkat</label>
+                                <textarea id="materi_desc" class="form-control" rows="3" placeholder="Penjelasan singkat materi ini" required></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="flex: 1;">
+                                    <label>Upload Gambar Cover (Opsional)</label>
+                                    <input type="file" id="materi_image" class="form-control" accept="image/*">
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>Upload File Materi (PDF/Excel/DOC) *Wajib</label>
+                                    <input type="file" id="materi_doc" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-1">Upload Materi</button>
+                        </form>
+                    </div>
+                    <div class="gallery-grid" id="materi-list">
+                        <!-- Rendered by JS -->
+                    </div>
+                </section>
+
+                <!-- SECTION: SETTINGS -->
+                <section id="settings" class="content-section d-none">
+                    <div class="section-header">
+                        <h2 class="section-title">Pengaturan Website</h2>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary btn-save-all">Simpan Pengaturan</button>
+                        </div>
+                    </div>
+                    <div class="form-card glass-panel mb-2">
+                        <h3>Identitas Sekolah</h3>
+                        <div class="form-group mt-1">
+                            <label>Nama Sekolah</label>
+                            <input type="text" id="school_name" class="form-control auto-save db-setting">
+                        </div>
+                        <div class="form-group">
+                            <label>Alamat Lengkap</label>
+                            <textarea id="school_address" class="form-control auto-save db-setting"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Link Google Maps</label>
+                            <input type="url" id="school_maps" class="form-control auto-save db-setting">
+                        </div>
+                    </div>
+                    
+                    <div class="form-card glass-panel">
+                        <h3>Kontak & Sosial Media</h3>
+                        <div class="form-row mt-1">
+                            <div class="form-group">
+                                <label>Nomor WhatsApp</label>
+                                <input type="text" id="school_wa" class="form-control auto-save db-setting">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="school_email" class="form-control auto-save db-setting">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Link Instagram</label>
+                                <input type="url" id="school_ig" class="form-control auto-save db-setting">
+                            </div>
+                            <div class="form-group">
+                                <label>Link TikTok</label>
+                                <input type="url" id="school_tiktok" class="form-control auto-save db-setting">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="js/script.js?v=4"></script>
+</body>
+</html>
