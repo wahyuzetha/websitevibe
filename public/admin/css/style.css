@@ -1,12 +1,12 @@
 :root {
-  --primary: #0b1c3d;
-  --primary-light: #1a365d;
-  --accent: #e53e3e;
-  --accent-hover: #c53030;
-  --bg: #f4f7f6;
+  --primary: #b91c1c;
+  --primary-light: #991b1b;
+  --accent: #475569;
+  --accent-hover: #334155;
+  --bg: #f1f5f9;
   --bg-panel: #ffffff;
-  --text: #333333;
-  --text-muted: #777777;
+  --text: #1e293b;
+  --text-muted: #64748b;
   --border: #e2e8f0;
   --sidebar-w: 260px;
   --shadow: 0 4px 6px rgba(0,0,0,0.05);
@@ -167,6 +167,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   .login-illustration svg { height: 150px; }
 }
 @media (max-width: 768px) {
+    .d-lg-none { display: block !important; }
   :root { --sidebar-w: 0px; }
   .sidebar { transform: translateX(-100%); width: 260px; }
   .sidebar.open { transform: translateX(0); }
@@ -176,3 +177,4 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   .topbar { padding: 0 15px; }
   .search-bar { width: 200px; }
 }
+

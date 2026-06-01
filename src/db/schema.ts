@@ -54,3 +54,13 @@ export const materials = mysqlTable('materials', {
   fileUrl: varchar('file_url', { length: 500 }),
   createdAt: timestamp('created_at').defaultNow()
 });
+
+export const hero_slides = mysqlTable('hero_slides', {
+  id: int('id').autoincrement().primaryKey(),
+  imageUrl: varchar('image_url', { length: 500 }).notNull(),
+  title: varchar('title', { length: 255 }).notNull(),
+  description: text('description'),
+  buttonText: varchar('button_text', { length: 100 }),
+  buttonLink: varchar('button_link', { length: 500 }),
+  createdAt: timestamp('created_at').defaultNow()
+});

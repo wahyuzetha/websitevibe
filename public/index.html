@@ -36,35 +36,21 @@
     </div>
   </nav>
 
-  <!-- 2. Hero Section -->
-  <header id="home" class="hero">
-    <div class="container hero-container">
-      <div class="hero-content">
-        <h1 id="hero_title">Jurusan Telkom — <br> <span class="highlight">Siap Kerja, Siap Kuliah, Siap Masa Depan</span></h1>
-        <p id="hero_subtitle">Belajar teknologi jaringan, internet, komunikasi digital, dan keterampilan industri modern bersama SMK Karya Nugraha Boyolali.</p>
-        <div class="hero-buttons">
-          <a href="#daftar" class="btn btn-primary btn-large" id="hero_btn1">Daftar Sekarang</a>
-          <a href="#keunggulan" class="btn btn-secondary btn-large" id="hero_btn2">Lihat Keunggulan</a>
-        </div>
-      </div>
-      <div class="hero-visual">
-        <div class="glow-effect"></div>
-        <div class="illustration-box">
-          <svg class="floating-anim" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
-             <rect x="50" y="100" width="400" height="250" rx="20" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-             <circle cx="100" cy="150" r="10" fill="#e53e3e"/>
-             <circle cx="130" cy="150" r="10" fill="#feca57"/>
-             <circle cx="160" cy="150" r="10" fill="#1dd1a1"/>
-             <rect x="90" y="180" width="320" height="10" rx="5" fill="rgba(255,255,255,0.3)"/>
-             <rect x="90" y="210" width="200" height="10" rx="5" fill="rgba(255,255,255,0.3)"/>
-             <rect x="90" y="240" width="280" height="10" rx="5" fill="rgba(255,255,255,0.3)"/>
-             <path d="M 250 180 L 380 320" stroke="#e53e3e" stroke-width="4" fill="none"/>
-             <circle cx="380" cy="320" r="15" fill="#e53e3e" class="pulse-anim"/>
-          </svg>
-        </div>
-      </div>
+  <!-- 2. Hero Carousel Section -->
+  <section id="home" class="hero-carousel" aria-roledescription="carousel" aria-label="Hero Slider">
+    <div class="carousel-container" id="hero_slider_container">
+      <!-- Slides akan dirender oleh Javascript -->
     </div>
-  </header>
+
+    <!-- Carousel Controls -->
+    <button class="carousel-control prev" aria-label="Previous slide">&#10094;</button>
+    <button class="carousel-control next" aria-label="Next slide">&#10095;</button>
+    
+    <!-- Carousel Indicators -->
+    <div class="carousel-indicators" id="hero_slider_indicators">
+      <!-- Dots akan dirender oleh Javascript -->
+    </div>
+  </section>
 
   <!-- 3. Tentang Jurusan -->
   <section id="tentang" class="section">

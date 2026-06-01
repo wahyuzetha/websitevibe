@@ -2,7 +2,7 @@ import { Elysia } from "elysia";
 import { staticPlugin } from "@elysiajs/static";
 import { jwt } from "@elysiajs/jwt";
 import { db } from "./db";
-import { users, settings, advantages, gallery, careers, testimonials, faqs, materials } from "./db/schema";
+import { users, settings, advantages, gallery, careers, testimonials, faqs, materials, hero_slides } from "./db/schema";
 import { eq } from "drizzle-orm";
 
 const app = new Elysia()
@@ -103,7 +103,8 @@ const app = new Elysia()
         careers: await db.select().from(careers),
         testimonials: await db.select().from(testimonials),
         faqs: await db.select().from(faqs),
-        materials: await db.select().from(materials)
+        materials: await db.select().from(materials),
+        hero_slides: await db.select().from(hero_slides)
       }
     };
   })
@@ -180,6 +181,13 @@ const app = new Elysia()
       return { success: false, error: e.message };
     }
   })
+  .get("/api/content/material/:id", async ({ params }: any) => {
+    const record = await db.select().from(materials).where(eq(materials.id, parseInt(params.id)));
+    if (record.length > 0) {
+      return { success: true, data: record[0] };
+    }
+    return { success: false, message: "Materi tidak ditemukan" };
+  })
   .post("/api/content/material", async ({ body, jwt, cookie: { auth } }: any) => {
     const token = auth.value;
     if (!token) return { success: false, message: "Unauthorized" };
@@ -230,6 +238,47 @@ const app = new Elysia()
     }
     return { success: true };
   })
+  
+  .post("/api/content/hero_slides", async ({ body, jwt, cookie: { auth } }: any) => {
+    const token = auth.value;
+    if (!token) return { success: false, message: "Unauthorized" };
+    try { await jwt.verify(token); } catch(e) { return { success: false, message: "Unauthorized" }; }
+    
+    const imageFile = body.image as File;
+    const title = body.title || 'Slide Title';
+    const description = body.description || '';
+    const buttonText = body.buttonText || '';
+    const buttonLink = body.buttonLink || '#';
+    
+    if (!imageFile || !imageFile.name) {
+      return { success: false, message: "File gambar wajib diupload" };
+    }
+
+    const extImg = imageFile.name.split('.').pop();
+    const imgName = `hero_${Date.now()}.${extImg}`;
+    const imgPath = `public/uploads/hero/${imgName}`;
+    await Bun.write(imgPath, imageFile);
+    const imageUrl = `/uploads/hero/${imgName}`;
+    
+    await db.insert(hero_slides).values({ imageUrl, title, description, buttonText, buttonLink });
+    return { success: true, message: "Slide berhasil diunggah" };
+  })
+  .delete("/api/content/hero_slides/:id", async ({ params, jwt, cookie: { auth } }: any) => {
+    const token = auth.value;
+    if (!token) return { success: false, message: "Unauthorized" };
+    try { await jwt.verify(token); } catch(e) { return { success: false, message: "Unauthorized" }; }
+    
+    const record = await db.select().from(hero_slides).where(eq(hero_slides.id, parseInt(params.id)));
+    if (record.length > 0) {
+      const fs = require('fs');
+      try {
+        if(record[0].imageUrl) fs.unlinkSync(`public${record[0].imageUrl}`);
+      } catch(e) {}
+      await db.delete(hero_slides).where(eq(hero_slides.id, parseInt(params.id)));
+    }
+    return { success: true };
+  })
+
   .get("/ping", () => ({ status: "ok", message: "pong" }))
   .listen(3000);
 

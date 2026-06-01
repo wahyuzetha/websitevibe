@@ -43,6 +43,7 @@
         <main class="main-content">
             <!-- Navbar Atas -->
             <header class="topbar">
+                <button id="mobile-menu-btn" class="icon-btn d-lg-none" style="display: none; margin-right: 15px;">?</button>
                 <div class="search-bar">
                     <span>🔍</span>
                     <input type="text" placeholder="Cari menu atau konten...">
@@ -111,28 +112,42 @@
                 <!-- SECTION: EDIT HERO -->
                 <section id="edit-hero" class="content-section d-none">
                     <div class="section-header">
-                        <h2 class="section-title">Edit Hero Section</h2>
-                        <button class="btn btn-primary btn-save-all">Simpan Perubahan</button>
+                        <h2 class="section-title">Edit Hero Slider</h2>
                     </div>
-                    <div class="form-card glass-panel">
-                        <div class="form-group">
-                            <label>Judul Utama</label>
-                            <input type="text" id="hero_title" class="form-control auto-save db-setting">
-                        </div>
-                        <div class="form-group">
-                            <label>Subjudul (Deskripsi)</label>
-                            <textarea id="hero_subtitle" class="form-control auto-save db-setting" rows="3"></textarea>
-                        </div>
-                        <div class="form-row">
+                    
+                    <div class="form-card glass-panel" style="margin-bottom: 30px;">
+                        <h3 style="margin-bottom: 15px; color: var(--primary-color);">Tambah Slide Baru</h3>
+                        <form id="heroUploadForm">
                             <div class="form-group">
-                                <label>Teks Tombol 1 (Primary)</label>
-                                <input type="text" id="hero_btn1" class="form-control auto-save db-setting">
+                                <label>Gambar Slide</label>
+                                <input type="file" id="heroImageInput" accept="image/*" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label>Teks Tombol 2 (Secondary)</label>
-                                <input type="text" id="hero_btn2" class="form-control auto-save db-setting">
+                                <label>Judul Utama</label>
+                                <input type="text" id="heroTitleInput" class="form-control" required placeholder="Contoh: Jaringan Komputer Masa Depan">
                             </div>
-                        </div>
+                            <div class="form-group">
+                                <label>Subjudul (Deskripsi)</label>
+                                <textarea id="heroDescInput" class="form-control" rows="3" placeholder="Deskripsi singkat slide..."></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Teks Tombol (Opsional)</label>
+                                    <input type="text" id="heroBtnTextInput" class="form-control" placeholder="Contoh: Mulai Perjalananmu">
+                                </div>
+                                <div class="form-group">
+                                    <label>Link Tombol (Opsional)</label>
+                                    <input type="text" id="heroBtnLinkInput" class="form-control" placeholder="Contoh: #daftar">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="btnUploadHero">Unggah Slide</button>
+                        </form>
+                    </div>
+
+                    <h3 style="margin-bottom: 15px; color: var(--primary-color);">Daftar Slide Aktif</h3>
+                    <div class="gallery-grid" id="admin_hero_grid">
+                        <!-- Hero slides will be rendered here dynamically -->
+                        <p style="color: #666;">Memuat slide...</p>
                     </div>
                 </section>
 
@@ -346,6 +361,8 @@
         </main>
     </div>
 
-    <script src="js/script.js?v=4"></script>
+    <script src="js/script.js?v=6"></script>
 </body>
 </html>
+
+

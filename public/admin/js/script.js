@@ -76,21 +76,43 @@ document.addEventListener('DOMContentLoaded', () => {
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            
-            // Remove active classes
-            navLinks.forEach(l => l.classList.remove('active'));
-            sections.forEach(s => s.classList.add('d-none'));
-            
-            // Add active to clicked and show section
-            link.classList.add('active');
-            const targetId = link.getAttribute('data-target');
-            document.getElementById(targetId).classList.remove('d-none');
-            document.getElementById(targetId).classList.add('active');
-            
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            try {
+                navLinks.forEach(l => l.classList.remove('active'));
+                sections.forEach(s => {
+                    s.classList.add('d-none');
+                    s.classList.remove('active');
+                });
+
+                link.classList.add('active');
+                const targetId = link.getAttribute('data-target');
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.classList.remove('d-none');
+                    targetSection.classList.add('active');
+                    if (window.innerWidth <= 768) {
+                        document.querySelector('.sidebar')?.classList.remove('open');
+                    }
+                    if (window.scrollTo) {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                } else {
+                    alert('Menu tidak ditemukan: ' + targetId);
+                }
+            } catch(err) {
+                console.error(err);
+                alert('Kesalahan navigasi: ' + err.message);
+            }
         });
     });
+
+    // Mobile Sidebar Toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const sidebar = document.querySelector('.sidebar');
+    if(mobileMenuBtn && sidebar) {
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+    }
 
     // Dark Mode Toggle
     const themeToggle = document.getElementById('theme-toggle');
@@ -177,6 +199,36 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="form-group"><label>Jawaban</label><textarea class="form-control" rows="3">${faq.answer}</textarea></div>
                         </div>
                     `).join('');
+                }
+
+                
+                // Populate Hero Slides
+                const heroGrid = document.getElementById('admin_hero_grid');
+                if(heroGrid && result.data.hero_slides) {
+                    if (result.data.hero_slides.length === 0) {
+                        heroGrid.innerHTML = '<p class="text-muted">Belum ada slide. Silakan unggah.</p>';
+                    } else {
+                        heroGrid.innerHTML = result.data.hero_slides.map(slide => `
+                            <div class="gallery-item-edit" style="background-image: url('${slide.imageUrl}'); background-size: cover; background-position: center; position: relative;">
+                                <div style="background: rgba(0,0,0,0.6); padding: 10px; color: white; position: absolute; bottom: 0; width: 100%; box-sizing: border-box;">
+                                    <h4 style="margin: 0; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${slide.title}</h4>
+                                    <p style="margin: 5px 0 0; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${slide.description}</p>
+                                </div>
+                                <button class="icon-btn btn-delete-hero" data-id="${slide.id}" style="position: absolute; top: 10px; right: 10px; background: white; border-radius: 50%; padding: 5px; cursor: pointer; border: none;">🗑️</button>
+                            </div>
+                        `).join('');
+                        
+                        document.querySelectorAll('.btn-delete-hero').forEach(btn => {
+                            btn.addEventListener('click', async (e) => {
+                                if(confirm("Yakin hapus slide ini?")) {
+                                    const id = e.currentTarget.getAttribute('data-id');
+                                    await fetch('/api/content/hero_slides/' + id, { method: 'DELETE' });
+                                    loadContent();
+                                    showToast("Slide dihapus");
+                                }
+                            });
+                        });
+                    }
                 }
 
                 // Populate Gallery
@@ -381,4 +433,48 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
+    // Upload Hero Slide
+    const heroUploadForm = document.getElementById('heroUploadForm');
+    if (heroUploadForm) {
+        heroUploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnUploadHero');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Mengunggah...';
+            btn.disabled = true;
+
+            const fileInput = document.getElementById('heroImageInput');
+            const file = fileInput.files[0];
+            if(!file) { alert('Pilih gambar!'); btn.innerHTML = originalText; btn.disabled = false; return; }
+
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('title', document.getElementById('heroTitleInput').value);
+            formData.append('description', document.getElementById('heroDescInput').value);
+            formData.append('buttonText', document.getElementById('heroBtnTextInput').value);
+            formData.append('buttonLink', document.getElementById('heroBtnLinkInput').value);
+
+            try {
+                const res = await fetch('/api/content/hero_slides', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                if(result.success) {
+                    showToast('Slide berhasil ditambahkan!');
+                    heroUploadForm.reset();
+                    loadContent(); // Reload grid
+                } else {
+                    alert('Gagal: ' + result.message);
+                }
+            } catch(e) {
+                alert('Terjadi kesalahan');
+            }
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    }
+
 });
+

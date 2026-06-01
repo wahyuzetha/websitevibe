@@ -7,11 +7,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Fetch Dynamic CMS Content
     try {
-        const res = await fetch('/api/content/all');
+        const res = await fetch('/api/content/all?t=' + new Date().getTime());
         const result = await res.json();
         
         if (result.success && result.data) {
-            const set = result.data.settings;
+            const set = (result.data.settings && result.data.settings.length > 0) ? result.data.settings[0] : {};
             const bindText = (id, text) => {
                 const el = document.getElementById(id);
                 if (el && text) el.innerHTML = text;
@@ -33,16 +33,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             bindText('stat1_val', set.stat1_val);
-            document.getElementById('stat1_val')?.setAttribute('data-target', set.stat1_val);
+            const stat1 = document.getElementById('stat1_val');
+            if (stat1) stat1.setAttribute('data-target', set.stat1_val);
             bindText('stat1_label', set.stat1_label);
             bindText('stat2_val', set.stat2_val);
-            document.getElementById('stat2_val')?.setAttribute('data-target', set.stat2_val);
+            const stat2 = document.getElementById('stat2_val');
+            if (stat2) stat2.setAttribute('data-target', set.stat2_val);
             bindText('stat2_label', set.stat2_label);
             bindText('stat3_val', set.stat3_val);
-            document.getElementById('stat3_val')?.setAttribute('data-target', set.stat3_val);
+            const stat3 = document.getElementById('stat3_val');
+            if (stat3) stat3.setAttribute('data-target', set.stat3_val);
             bindText('stat3_label', set.stat3_label);
             bindText('stat4_val', set.stat4_val);
-            document.getElementById('stat4_val')?.setAttribute('data-target', set.stat4_val);
+            const stat4 = document.getElementById('stat4_val');
+            if (stat4) stat4.setAttribute('data-target', set.stat4_val);
             bindText('stat4_label', set.stat4_label);
 
             bindText('navbar_school_name', set.school_name);
@@ -77,25 +81,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             `);
 
             renderList('gallery_container', result.data.gallery, item => {
-                const safeTitle = item.title.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                const titleStr = item.title || '';
+                const safeTitle = titleStr.replace(/'/g, "\\'").replace(/"/g, "&quot;");
                 return `
                 <div class="galeri-item" onclick="window.openLightbox('${item.imageUrl}', '${safeTitle}')">
                   <div class="galeri-img" style="background-image: url('${item.imageUrl}'); background-size: cover; background-position: center;"></div>
-                  <div class="galeri-overlay"><span>${item.title}</span></div>
+                  <div class="galeri-overlay"><span>${titleStr}</span></div>
                 </div>
                 `;
             });
 
-            renderList('materi_container', result.data.materials, item => `
+            renderList('materi_container', result.data.materials, item => {
+                const defaultImg = 'https://placehold.co/600x400/e2e8f0/64748b?text=Materi+Pembelajaran';
+                const imgSrc = item.imageUrl ? item.imageUrl : defaultImg;
+                return `
                 <div class="materi-card">
-                  ${item.imageUrl ? `<div class="materi-img" style="background-image: url('${item.imageUrl}');"></div>` : `<div class="materi-img" style="display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:40px;">📄</div>`}
+                  <div class="materi-img" style="background-image: url('${imgSrc}');"></div>
                   <div class="materi-content">
                     <h3>${item.title}</h3>
                     <p>${item.description}</p>
-                    <a href="${item.fileUrl}" class="btn btn-outline" target="_blank" download>Download Materi</a>
+                    <a href="/detail-materi.html?id=${item.id}" class="btn btn-outline">Lihat Detail Materi ↗</a>
                   </div>
                 </div>
-            `);
+                `;
+            });
 
             // Expose lightbox function
             window.openLightbox = (src, title) => {
@@ -128,6 +137,40 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             `);
             
+            // Render Hero Slides
+            if (result.data.hero_slides && result.data.hero_slides.length > 0) {
+                const carousel = document.querySelector('.hero-carousel');
+                if (carousel) {
+                    let slidesHtml = '';
+                    let dotsHtml = '';
+                    result.data.hero_slides.forEach((slide, idx) => {
+                        const activeClass = idx === 0 ? 'active' : '';
+                        slidesHtml += `
+                            <div class="carousel-slide ${activeClass}" style="background-image: url('${slide.imageUrl}'); background-size: cover; background-position: center;">
+                                <div class="carousel-overlay" style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(15, 23, 42, 0.6);"></div>
+                                <div class="carousel-content" style="position: relative; z-index: 3; color: white; max-width: 800px; padding: 0 20px; text-align: left; display: flex; flex-direction: column; justify-content: center; height: 100%; margin: 0 auto;">
+                                    <h1 class="slide-title" style="margin-bottom: 20px;">${slide.title}</h1>
+                                    <p class="slide-desc" style="margin-bottom: 30px;">${slide.description}</p>
+                                    <div class="hero-buttons">
+                                        ${slide.buttonText ? `<a href="${slide.buttonLink || '#'}" class="btn btn-slider-primary" style="display: inline-block;">${slide.buttonText}</a>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        dotsHtml += `<div class="dot ${activeClass}"></div>`;
+                    });
+                    
+                    const container = document.getElementById('hero_slider_container');
+                    const indicators = document.getElementById('hero_slider_indicators');
+                    
+                    if (container) container.innerHTML = slidesHtml;
+                    if (indicators) indicators.innerHTML = dotsHtml;
+                }
+            }
+
+            // Initialize Hero Carousel now that DOM is ready
+            if (typeof initCarousel === 'function') initCarousel();
+
             // Re-initialize accordion logic
             setTimeout(() => {
                 const accordionHeaders = document.querySelectorAll('.accordion-header');
@@ -145,10 +188,103 @@ document.addEventListener('DOMContentLoaded', async () => {
                     });
                 });
             }, 100);
+
+            renderList('materi_page_container', result.data.materials, item => {
+                const dateStr = item.createdAt ? new Date(item.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+                const defaultImg = 'https://placehold.co/800x500/e2e8f0/64748b?text=Materi+Pembelajaran';
+                const imgSrc = item.imageUrl ? item.imageUrl : defaultImg;
+                return `
+                <div class="materi-card-full" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); display: flex; flex-direction: column; border: 1px solid #f1f5f9;">
+                    <div class="img-wrapper" style="width: 100%; height: 300px; background-color: #f8fafc;">
+                        <img src="${imgSrc}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="content" style="padding: 30px;">
+                        <h3 style="font-size: 1.8rem; color: var(--primary-color); margin-bottom: 15px;">${item.title}</h3>
+                        <span class="date" style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 20px; display: block;">Diunggah pada: ${dateStr}</span>
+                        <p style="color: var(--text-color); line-height: 1.7; margin-bottom: 30px; white-space: pre-line;">${item.description}</p>
+                        <a href="/detail-materi.html?id=${item.id}" class="btn btn-primary btn-download" style="display: inline-flex; align-items: center; gap: 10px; font-weight: 600; padding: 12px 30px; font-size: 1.1rem;">Lihat Detail Materi &#8599;</a>
+                    </div>
+                </div>
+                `;
+            });
+
+            // Initialize detail-materi if we are on that page
+            const urlParams = new URLSearchParams(window.location.search);
+            const detailId = urlParams.get('id');
+            const detailContainer = document.getElementById('detail_content');
+            
+            if (detailContainer) {
+                if (!detailId) {
+                    detailContainer.innerHTML = '<div style="text-align: center; padding: 50px; color: #64748b;">Silakan pilih materi terlebih dahulu.</div>';
+                } else if (result.data.materials) {
+                    const item = result.data.materials.find(m => m.id == detailId);
+                    if (item) {
+                        const dateStr = item.createdAt ? new Date(item.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+                        const isPdf = item.fileUrl && item.fileUrl.toLowerCase().endsWith('.pdf');
+                        let viewerHTML = '';
+                        
+                        if (isPdf) {
+                            viewerHTML = `
+                                <div class="pdf-container" style="width: 100%; height: 70vh; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 30px;">
+                                    <iframe src="${item.fileUrl}" style="width: 100%; height: 100%; border: none;"></iframe>
+                                </div>
+                            `;
+                        } else if (item.fileUrl) {
+                            viewerHTML = `
+                                <div class="file-download-box" style="background: #f8fafc; padding: 40px; border-radius: 10px; text-align: center; border: 2px dashed #cbd5e1; margin-bottom: 30px;">
+                                    <div style="font-size: 50px; margin-bottom: 15px;">&#128193;</div>
+                                    <h4 style="margin-bottom: 15px; color: var(--primary-color);">File Tersedia untuk Diunduh</h4>
+                                    <a href="${item.fileUrl}" target="_blank" class="btn btn-primary btn-download-large">Unduh File Sekarang &darr;</a>
+                                </div>
+                            `;
+                        }
+
+                        detailContainer.innerHTML = `
+                            <div style="max-width: 900px; margin: 0 auto;">
+                                <div class="detail-card" style="background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #f1f5f9;">
+                                    <div class="detail-header" style="padding: 40px; border-bottom: 1px solid #e2e8f0; display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap;">
+                                        <div class="detail-header-img" style="width: 200px; height: 250px; background-color: #f8fafc; border-radius: 10px; overflow: hidden; flex-shrink: 0; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:40px;">
+                                            <img src="${item.imageUrl ? item.imageUrl : 'https://placehold.co/600x800/e2e8f0/64748b?text=Materi'}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                                        </div>
+                                        <div class="detail-header-info" style="flex: 1; min-width: 300px;">
+                                            <h1 class="detail-title" style="font-size: 2.2rem; color: var(--primary-color); margin-bottom: 10px; line-height: 1.2;">${item.title}</h1>
+                                            <div class="detail-meta" style="display: flex; gap: 20px; color: #94a3b8; font-size: 0.95rem; margin-bottom: 25px;">
+                                                <span>&#128197; Diunggah: ${dateStr}</span>
+                                            </div>
+                                            <div class="detail-desc" style="font-size: 1.05rem; color: #475569; line-height: 1.8; margin-bottom: 30px; white-space: pre-line;">${item.description}</div>
+                                        </div>
+                                    </div>
+                                    ${viewerHTML}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        detailContainer.innerHTML = '<div style="text-align: center; padding: 50px; color:red;">Materi tidak ditemukan.</div>';
+                    }
+                } else {
+                    detailContainer.innerHTML = '<div style="text-align: center; padding: 50px; color:red;">Gagal memuat materi.</div>';
+                }
+            }
         }
     } catch(err) {
         console.error('Failed to fetch CMS content:', err);
-        alert("CMS Load Error: " + err.message);
+        const errDiv = document.createElement('div');
+        errDiv.style.padding = '20px';
+        errDiv.style.background = '#ffebee';
+        errDiv.style.color = '#c62828';
+        errDiv.style.textAlign = 'center';
+        errDiv.style.margin = '20px';
+        errDiv.style.borderRadius = '8px';
+        errDiv.innerHTML = `<strong>Koneksi Gagal:</strong> Gagal memuat data dari server. <br><small>${err.message}</small>`;
+        
+        // Try to inject error message into main containers so user sees it instead of a blank screen
+        const mc = document.getElementById('materi_page_container');
+        if (mc) mc.innerHTML = '';
+        if (mc) mc.appendChild(errDiv.cloneNode(true));
+        
+        const hc = document.getElementById('hero_slider_container');
+        if (hc) hc.innerHTML = '';
+        if (hc) hc.appendChild(errDiv.cloneNode(true));
     }
     if (window.scrollY > 50) {
         navbar.classList.add('scrolled');
@@ -260,3 +396,96 @@ accordionItems.forEach(item => {
         item.classList.toggle('active');
     });
 });
+
+/* =========================================
+   Hero Carousel Logic
+   ========================================= */
+function initCarousel() {
+    const carousel = document.querySelector('.hero-carousel');
+    if (!carousel) return;
+
+    const slides = carousel.querySelectorAll('.carousel-slide');
+    const dots = carousel.querySelectorAll('.carousel-indicators .dot');
+    const prevBtn = carousel.querySelector('.carousel-control.prev');
+    const nextBtn = carousel.querySelector('.carousel-control.next');
+    
+    let currentIndex = 0;
+    let slideInterval;
+    const intervalTime = 5000; // 5 detik
+
+    const updateSlide = (index) => {
+        // Hapus class active dari slide & dot saat ini
+        slides[currentIndex].classList.remove('active');
+        dots[currentIndex].classList.remove('active');
+        
+        currentIndex = index;
+        
+        // Cek batasan index
+        if (currentIndex < 0) currentIndex = slides.length - 1;
+        if (currentIndex >= slides.length) currentIndex = 0;
+        
+        // Tambahkan class active ke slide & dot baru
+        slides[currentIndex].classList.add('active');
+        dots[currentIndex].classList.add('active');
+    };
+
+    const nextSlide = () => updateSlide(currentIndex + 1);
+    const prevSlide = () => updateSlide(currentIndex - 1);
+
+    // Event listeners tombol
+    if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); resetInterval(); });
+    if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); resetInterval(); });
+
+    // Event listeners dots
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            updateSlide(index);
+            resetInterval();
+        });
+    });
+
+    // Auto Slide
+    const startInterval = () => {
+        slideInterval = setInterval(nextSlide, intervalTime);
+    };
+    
+    const resetInterval = () => {
+        clearInterval(slideInterval);
+        startInterval();
+    };
+
+    // Pause on hover
+    carousel.addEventListener('mouseenter', () => clearInterval(slideInterval));
+    carousel.addEventListener('mouseleave', () => startInterval());
+
+    // Touch Support (Swipe)
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    carousel.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        clearInterval(slideInterval);
+    }, {passive: true});
+
+    carousel.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+        startInterval();
+    }, {passive: true});
+
+    const handleSwipe = () => {
+        const swipeThreshold = 50; // minimum distance to trigger swipe
+        if (touchEndX < touchStartX - swipeThreshold) {
+            nextSlide(); // Swipe left -> next
+        }
+        if (touchEndX > touchStartX + swipeThreshold) {
+            prevSlide(); // Swipe right -> prev
+        }
+    };
+
+    // Mulai auto-slide pertama kali
+    startInterval();
+};
+
+
+
