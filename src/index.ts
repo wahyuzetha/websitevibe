@@ -5,11 +5,18 @@ import { db } from "./db";
 import { users, settings, advantages, gallery, careers, testimonials, faqs, materials, hero_slides } from "./db/schema";
 import { eq } from "drizzle-orm";
 
+// Variabel untuk in-memory cache
+let contentCache: any = null;
+const invalidateCache = () => {
+  contentCache = null;
+};
+
 const app = new Elysia()
-  .onRequest(({ set }) => {
-    set.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate';
-    set.headers['Pragma'] = 'no-cache';
-    set.headers['Expires'] = '0';
+  .onRequest(({ set, request }) => {
+    // Biarkan static assets di-cache browser, hindari cache hanya untuk API route
+    if (request.url.includes("/api/")) {
+      set.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate';
+    }
   })
   .use(staticPlugin({ assets: "public", prefix: "/" }))
   .use(
@@ -88,24 +95,32 @@ const app = new Elysia()
     return { success: true, authenticated: true, user: { name: userRecord[0].name, role: userRecord[0].role } };
   })
   .get("/api/content/all", async () => {
+    // Jika cache tersedia di RAM, langsung return (0.1ms)
+    if (contentCache) {
+      return { success: true, data: contentCache };
+    }
+
     const settingsData = await db.select().from(settings);
     const settingsObj = settingsData.reduce((acc: any, curr) => {
       acc[curr.key] = curr.value;
       return acc;
     }, {});
     
+    // Simpan ke memori cache
+    contentCache = {
+      settings: settingsObj,
+      advantages: await db.select().from(advantages),
+      gallery: await db.select().from(gallery),
+      careers: await db.select().from(careers),
+      testimonials: await db.select().from(testimonials),
+      faqs: await db.select().from(faqs),
+      materials: await db.select().from(materials),
+      hero_slides: await db.select().from(hero_slides)
+    };
+
     return {
       success: true,
-      data: {
-        settings: settingsObj,
-        advantages: await db.select().from(advantages),
-        gallery: await db.select().from(gallery),
-        careers: await db.select().from(careers),
-        testimonials: await db.select().from(testimonials),
-        faqs: await db.select().from(faqs),
-        materials: await db.select().from(materials),
-        hero_slides: await db.select().from(hero_slides)
-      }
+      data: contentCache
     };
   })
   .post("/api/content/settings", async ({ body, jwt, cookie: { auth } }: any) => {
@@ -122,6 +137,7 @@ const app = new Elysia()
          await db.insert(settings).values({ key, value });
       }
     }
+    invalidateCache();
     return { success: true };
   })
   .post("/api/content/gallery", async ({ body, jwt, cookie: { auth } }: any) => {
@@ -149,6 +165,7 @@ const app = new Elysia()
     // Simpan ke database
     await db.insert(gallery).values({ imageUrl, title });
     
+    invalidateCache();
     return { success: true, message: "Gambar berhasil diunggah" };
   })
   .delete("/api/content/gallery/:id", async ({ params, jwt, cookie: { auth } }: any) => {
@@ -166,6 +183,7 @@ const app = new Elysia()
         }
       } catch(e) {}
       await db.delete(gallery).where(eq(gallery.id, parseInt(params.id)));
+      invalidateCache();
     }
     return { success: true };
   })
@@ -218,6 +236,7 @@ const app = new Elysia()
     const fileUrl = `/uploads/materials/${docName}`;
     
     await db.insert(materials).values({ title, description, imageUrl, fileUrl });
+    invalidateCache();
     return { success: true, message: "Materi berhasil diunggah" };
   })
   .delete("/api/content/material/:id", async ({ params, jwt, cookie: { auth } }: any) => {
@@ -235,6 +254,7 @@ const app = new Elysia()
         if(record[0].fileUrl) fs.unlinkSync(`public${record[0].fileUrl}`);
       } catch(e) {}
       await db.delete(materials).where(eq(materials.id, parseInt(params.id)));
+      invalidateCache();
     }
     return { success: true };
   })
@@ -261,6 +281,7 @@ const app = new Elysia()
     const imageUrl = `/uploads/hero/${imgName}`;
     
     await db.insert(hero_slides).values({ imageUrl, title, description, buttonText, buttonLink });
+    invalidateCache();
     return { success: true, message: "Slide berhasil diunggah" };
   })
   .delete("/api/content/hero_slides/:id", async ({ params, jwt, cookie: { auth } }: any) => {
@@ -275,6 +296,7 @@ const app = new Elysia()
         if(record[0].imageUrl) fs.unlinkSync(`public${record[0].imageUrl}`);
       } catch(e) {}
       await db.delete(hero_slides).where(eq(hero_slides.id, parseInt(params.id)));
+      invalidateCache();
     }
     return { success: true };
   })

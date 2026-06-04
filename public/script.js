@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Fetch Dynamic CMS Content
     try {
-        const res = await fetch('/api/content/all?t=' + new Date().getTime());
+        // Menggunakan fetch biasa agar browser bisa me-reuse cache JSON
+        const res = await fetch('/api/content/all');
         const result = await res.json();
         
         if (result.success && result.data) {
@@ -196,7 +197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return `
                 <div class="materi-card-full" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); display: flex; flex-direction: column; border: 1px solid #f1f5f9;">
                     <div class="img-wrapper" style="width: 100%; height: 300px; background-color: #f8fafc;">
-                        <img src="${imgSrc}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <img src="${imgSrc}" alt="${item.title}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <div class="content" style="padding: 30px;">
                         <h3 style="font-size: 1.8rem; color: var(--primary-color); margin-bottom: 15px;">${item.title}</h3>
@@ -244,7 +245,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 <div class="detail-card" style="background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #f1f5f9;">
                                     <div class="detail-header" style="padding: 40px; border-bottom: 1px solid #e2e8f0; display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap;">
                                         <div class="detail-header-img" style="width: 200px; height: 250px; background-color: #f8fafc; border-radius: 10px; overflow: hidden; flex-shrink: 0; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:40px;">
-                                            <img src="${item.imageUrl ? item.imageUrl : 'https://placehold.co/600x800/e2e8f0/64748b?text=Materi'}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                                            <img src="${item.imageUrl ? item.imageUrl : 'https://placehold.co/600x800/e2e8f0/64748b?text=Materi'}" alt="${item.title}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
                                         </div>
                                         <div class="detail-header-info" style="flex: 1; min-width: 300px;">
                                             <h1 class="detail-title" style="font-size: 2.2rem; color: var(--primary-color); margin-bottom: 10px; line-height: 1.2;">${item.title}</h1>
