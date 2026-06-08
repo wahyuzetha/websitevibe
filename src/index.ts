@@ -112,7 +112,14 @@ const app = new Elysia()
       advantages: await db.select().from(advantages),
       gallery: await db.select().from(gallery),
       careers: await db.select().from(careers),
-      testimonials: await db.select().from(testimonials),
+      testimonials: (await db.select().from(testimonials)).map((t: any) => {
+        try {
+          const parsed = JSON.parse(t.text || '{}');
+          return { id: t.id, name: t.name, rating: t.rating, role: parsed.role || '', content: parsed.content || t.text };
+        } catch(e) {
+          return { id: t.id, name: t.name, rating: t.rating, role: '', content: t.text };
+        }
+      }),
       faqs: await db.select().from(faqs),
       materials: await db.select().from(materials),
       hero_slides: await db.select().from(hero_slides)
@@ -356,7 +363,8 @@ const app = new Elysia()
     const { name, role, content, rating } = body as { name: string, role: string, content: string, rating: number };
     if (!name || !content) return { success: false, message: "Name and content required" };
     
-    await db.insert(testimonials).values({ name, role, content, rating: rating || 5 });
+    const textData = JSON.stringify({ role, content });
+    await db.insert(testimonials).values({ name, rating: rating || 5, text: textData });
     invalidateCache();
     return { success: true };
   })
