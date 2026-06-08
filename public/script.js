@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const result = await res.json();
         
         if (result.success && result.data) {
-            const set = (result.data.settings && result.data.settings.length > 0) ? result.data.settings[0] : {};
+            const set = result.data.settings || {};
             const bindText = (id, text) => {
                 const el = document.getElementById(id);
                 if (el && text) el.innerHTML = text;
