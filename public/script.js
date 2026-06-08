@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     // langsung timpa teksnya agar tidak bentrok dengan animasi bawaan HTML
                     if (window.hasCounted) {
                         el.innerText = val;
+                        el.classList.add('stop-anim');
                     }
                 }
             };
@@ -341,6 +342,7 @@ const startCounters = () => {
         
         let current = 0;
         const updateCounter = () => {
+            if (counter.classList.contains('stop-anim')) return;
             current += increment;
             if (current < target) {
                 counter.innerText = Math.ceil(current);
