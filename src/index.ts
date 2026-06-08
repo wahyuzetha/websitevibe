@@ -112,14 +112,7 @@ const app = new Elysia()
       advantages: await db.select().from(advantages),
       gallery: await db.select().from(gallery),
       careers: await db.select().from(careers),
-      testimonials: (await db.select().from(testimonials)).map((t: any) => {
-        try {
-          const parsed = JSON.parse(t.text || '{}');
-          return { id: t.id, name: t.name, rating: t.rating, role: parsed.role || '', content: parsed.content || t.text };
-        } catch(e) {
-          return { id: t.id, name: t.name, rating: t.rating, role: '', content: t.text };
-        }
-      }),
+      testimonials: await db.select().from(testimonials),
       faqs: await db.select().from(faqs),
       materials: await db.select().from(materials),
       hero_slides: await db.select().from(hero_slides)
@@ -363,8 +356,7 @@ const app = new Elysia()
     const { name, role, content, rating } = body as { name: string, role: string, content: string, rating: number };
     if (!name || !content) return { success: false, message: "Name and content required" };
     
-    const textData = JSON.stringify({ role, content });
-    await db.insert(testimonials).values({ name, rating: rating || 5, text: textData });
+    await db.insert(testimonials).values({ name, role, content, rating: rating || 5 });
     invalidateCache();
     return { success: true };
   })
@@ -376,6 +368,14 @@ const app = new Elysia()
     await db.delete(testimonials).where(eq(testimonials.id, parseInt(params.id)));
     invalidateCache();
     return { success: true };
+  })
+  .get("/api/debug/db", async () => {
+    try {
+      const res = await db.execute(require('drizzle-orm').sql`SHOW COLUMNS FROM testimonials`);
+      return { success: true, columns: res[0] };
+    } catch(err: any) {
+      return { success: false, error: err.message };
+    }
   })
   .get("/ping", () => ({ status: "ok", message: "pong" }))
   .listen({ port: 3000, maxRequestBodySize: 1024 * 1024 * 50 });
