@@ -241,6 +241,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
+                // Populate Testimonials
+                const testimonialsList = document.getElementById('testimonials-list');
+                if(testimonialsList && result.data.testimonials) {
+                    if (result.data.testimonials.length === 0) {
+                        testimonialsList.innerHTML = '<p class="text-muted">Belum ada testimoni. Silakan tambahkan.</p>';
+                    } else {
+                        testimonialsList.innerHTML = result.data.testimonials.map(testi => `
+                            <div class="edit-card glass-panel" style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div style="flex: 1;">
+                                    <h4 style="margin: 0 0 5px 0;">${testi.name} <span style="font-size: 0.8em; color: #777;">(${testi.role})</span></h4>
+                                    <p style="margin: 0; font-size: 0.9em; color: #555;">"${testi.content}"</p>
+                                </div>
+                                <button class="btn btn-outline btn-delete-testi" data-id="${testi.id}" style="color: red; border-color: red;">Hapus</button>
+                            </div>
+                        `).join('');
+                        
+                        document.querySelectorAll('.btn-delete-testi').forEach(btn => {
+                            btn.addEventListener('click', async (e) => {
+                                if(confirm("Yakin hapus testimoni ini?")) {
+                                    const id = e.currentTarget.getAttribute('data-id');
+                                    const res = await fetch('/api/content/testimonials/' + id, { method: 'DELETE' });
+                                    const resData = await res.json();
+                                    if(resData.success) {
+                                        alert("Testimoni dihapus!");
+                                        location.reload();
+                                    } else {
+                                        alert("Gagal menghapus");
+                                    }
+                                }
+                            });
+                        });
+                    }
+                }
+
                 // Populate Hero Slides
                 const heroGrid = document.getElementById('admin_hero_grid');
                 if(heroGrid && result.data.hero_slides) {
@@ -537,6 +571,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await res.json();
                 if(result.success) {
                     alert("Berhasil menambah karier!");
+                    location.reload();
+                } else {
+                    alert("Gagal: " + result.message);
+                }
+            } catch(e) {
+                alert("Terjadi kesalahan sistem");
+            } finally {
+                submitBtn.innerText = oldText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
+
+    // Handle Upload Testimoni Baru
+    const addTestiForm = document.getElementById('add-testimonial-form');
+    if(addTestiForm) {
+        addTestiForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('testi_name').value;
+            const role = document.getElementById('testi_role').value;
+            const content = document.getElementById('testi_content').value;
+            
+            const submitBtn = addTestiForm.querySelector('button[type="submit"]');
+            const oldText = submitBtn.innerText;
+            submitBtn.innerText = "Menyimpan...";
+            submitBtn.disabled = true;
+            
+            try {
+                const res = await fetch('/api/content/testimonials', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, role, content, rating: 5 })
+                });
+                const result = await res.json();
+                if(result.success) {
+                    alert("Berhasil menambah testimoni!");
                     location.reload();
                 } else {
                     alert("Gagal: " + result.message);

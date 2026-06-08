@@ -348,6 +348,27 @@ const app = new Elysia()
     invalidateCache();
     return { success: true };
   })
+  .post("/api/content/testimonials", async ({ body, jwt, cookie: { auth } }: any) => {
+    const token = auth.value;
+    if (!token) return { success: false, message: "Unauthorized" };
+    try { await jwt.verify(token); } catch(e) { return { success: false, message: "Unauthorized" }; }
+    
+    const { name, role, content, rating } = body as { name: string, role: string, content: string, rating: number };
+    if (!name || !content) return { success: false, message: "Name and content required" };
+    
+    await db.insert(testimonials).values({ name, role, content, rating: rating || 5 });
+    invalidateCache();
+    return { success: true };
+  })
+  .delete("/api/content/testimonials/:id", async ({ params, jwt, cookie: { auth } }: any) => {
+    const token = auth.value;
+    if (!token) return { success: false, message: "Unauthorized" };
+    try { await jwt.verify(token); } catch(e) { return { success: false, message: "Unauthorized" }; }
+    
+    await db.delete(testimonials).where(eq(testimonials.id, parseInt(params.id)));
+    invalidateCache();
+    return { success: true };
+  })
   .get("/ping", () => ({ status: "ok", message: "pong" }))
   .listen({ port: 3000, maxRequestBodySize: 1024 * 1024 * 50 });
 

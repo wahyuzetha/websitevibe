@@ -286,7 +286,26 @@
                 <section id="edit-testimoni" class="content-section d-none">
                     <div class="section-header">
                         <h2 class="section-title">Edit Testimoni</h2>
-                        <button class="btn btn-outline">+ Tambah Testimoni</button>
+                    </div>
+                    <div class="form-card glass-panel mb-2">
+                        <h3>Tambah Testimoni Baru</h3>
+                        <form id="add-testimonial-form" class="form-row mt-1" style="flex-direction: column;">
+                            <div class="form-row">
+                                <div class="form-group" style="flex: 1;">
+                                    <label>Nama Lengkap</label>
+                                    <input type="text" id="testi_name" class="form-control" placeholder="Contoh: Budi Santoso" required>
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>Pekerjaan / Angkatan</label>
+                                    <input type="text" id="testi_role" class="form-control" placeholder="Contoh: IT Support - Alumni 2023" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Isi Testimoni</label>
+                                <textarea id="testi_content" class="form-control" rows="3" placeholder="Sangat terbantu belajar di SMK ini..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="align-self: flex-start;">Simpan Testimoni</button>
+                        </form>
                     </div>
                     <div class="cards-manager" id="testimonials-list">
                     </div>

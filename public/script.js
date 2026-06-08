@@ -160,6 +160,50 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <p>${item.description}</p>
                 </div>
             `);
+
+            renderList('testimonials_container', result.data.testimonials, (item, index) => {
+                const starsHtml = '★'.repeat(item.rating) + '☆'.repeat(5 - item.rating);
+                return `
+                <div class="testimoni-slide ${index === 0 ? 'active' : ''}">
+                    <div class="stars">${starsHtml}</div>
+                    <p>"${item.content}"</p>
+                    <h4>${item.name}</h4>
+                    <span>${item.role}</span>
+                </div>
+                `;
+            });
+            
+            // Initialize Testimonial Slider dynamically
+            if (result.data.testimonials && result.data.testimonials.length > 0) {
+                const slides = document.querySelectorAll('.testimoni-slide');
+                const prevBtn = document.getElementById('prev-slide');
+                const nextBtn = document.getElementById('next-slide');
+                let currentSlide = 0;
+
+                const showSlide = (index) => {
+                    slides.forEach(slide => slide.classList.remove('active'));
+                    if (index >= slides.length) currentSlide = 0;
+                    if (index < 0) currentSlide = slides.length - 1;
+                    slides[currentSlide].classList.add('active');
+                };
+
+                if(prevBtn && nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        currentSlide++;
+                        showSlide(currentSlide);
+                    });
+                    prevBtn.addEventListener('click', () => {
+                        currentSlide--;
+                        showSlide(currentSlide);
+                    });
+                    
+                    // Auto slide
+                    setInterval(() => {
+                        currentSlide++;
+                        showSlide(currentSlide);
+                    }, 5000);
+                }
+            }
             
             // Render Hero Slides
             if (result.data.hero_slides && result.data.hero_slides.length > 0) {
@@ -373,39 +417,6 @@ if (statSection) {
         }
     }, { threshold: 0.5 });
     observer.observe(statSection);
-}
-
-// Testimonial Slider
-const slides = document.querySelectorAll('.testimoni-slide');
-const prevBtn = document.getElementById('prev-slide');
-const nextBtn = document.getElementById('next-slide');
-let currentSlide = 0;
-
-function showSlide(index) {
-    slides.forEach(slide => slide.classList.remove('active'));
-    
-    if (index >= slides.length) currentSlide = 0;
-    if (index < 0) currentSlide = slides.length - 1;
-    
-    slides[currentSlide].classList.add('active');
-}
-
-if(prevBtn && nextBtn) {
-    nextBtn.addEventListener('click', () => {
-        currentSlide++;
-        showSlide(currentSlide);
-    });
-
-    prevBtn.addEventListener('click', () => {
-        currentSlide--;
-        showSlide(currentSlide);
-    });
-
-    // Auto slide
-    setInterval(() => {
-        currentSlide++;
-        showSlide(currentSlide);
-    }, 5000);
 }
 
 // FAQ Accordion
