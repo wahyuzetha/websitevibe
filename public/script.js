@@ -39,21 +39,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
 
-            bindText('stat1_val', set.stat1_val);
-            const stat1 = document.getElementById('stat1_val');
-            if (stat1) stat1.setAttribute('data-target', set.stat1_val);
+            // Update Stat Targets
+            const updateStat = (id, val) => {
+                const el = document.getElementById(id);
+                if (el && val) {
+                    el.setAttribute('data-target', val);
+                    // Jika counter sudah pernah dijalankan atau sedang berjalan, 
+                    // langsung timpa teksnya agar tidak bentrok dengan animasi bawaan HTML
+                    if (window.hasCounted) {
+                        el.innerText = val;
+                    }
+                }
+            };
+            
+            updateStat('stat1_val', set.stat1_val);
             bindText('stat1_label', set.stat1_label);
-            bindText('stat2_val', set.stat2_val);
-            const stat2 = document.getElementById('stat2_val');
-            if (stat2) stat2.setAttribute('data-target', set.stat2_val);
+            
+            updateStat('stat2_val', set.stat2_val);
             bindText('stat2_label', set.stat2_label);
-            bindText('stat3_val', set.stat3_val);
-            const stat3 = document.getElementById('stat3_val');
-            if (stat3) stat3.setAttribute('data-target', set.stat3_val);
+            
+            updateStat('stat3_val', set.stat3_val);
             bindText('stat3_label', set.stat3_label);
-            bindText('stat4_val', set.stat4_val);
-            const stat4 = document.getElementById('stat4_val');
-            if (stat4) stat4.setAttribute('data-target', set.stat4_val);
+            
+            updateStat('stat4_val', set.stat4_val);
             bindText('stat4_label', set.stat4_label);
 
             bindText('navbar_school_name', set.school_name);
@@ -323,7 +331,7 @@ document.querySelectorAll('.nav-links a').forEach(link => {
 
 // Counter Animation for Stats
 const counters = document.querySelectorAll('.counter');
-let hasCounted = false;
+window.hasCounted = false;
 
 const startCounters = () => {
     counters.forEach(counter => {
@@ -349,9 +357,9 @@ const startCounters = () => {
 const statSection = document.querySelector('.stat-section');
 if (statSection) {
     const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && !hasCounted) {
+        if (entries[0].isIntersecting && !window.hasCounted) {
+            window.hasCounted = true;
             startCounters();
-            hasCounted = true;
         }
     }, { threshold: 0.5 });
     observer.observe(statSection);
