@@ -349,7 +349,7 @@ const app = new Elysia()
     return { success: true };
   })
   .get("/ping", () => ({ status: "ok", message: "pong" }))
-  .listen(3000);
+  .listen({ port: 3000, maxRequestBodySize: 1024 * 1024 * 50 });
 
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
