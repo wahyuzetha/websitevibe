@@ -207,7 +207,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     `).join('');
                 }
 
-                
+                // Populate Careers
+                const careersList = document.getElementById('careers-list');
+                if(careersList && result.data.careers) {
+                    if (result.data.careers.length === 0) {
+                        careersList.innerHTML = '<p class="text-muted">Belum ada karier. Silakan tambahkan.</p>';
+                    } else {
+                        careersList.innerHTML = result.data.careers.map(career => `
+                            <div class="edit-card glass-panel" style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div style="flex: 1;">
+                                    <h4 style="margin: 0 0 5px 0;">${career.title}</h4>
+                                    <p style="margin: 0; font-size: 0.9em; color: #555;">${career.description}</p>
+                                </div>
+                                <button class="btn btn-outline btn-delete-career" data-id="${career.id}" style="color: red; border-color: red;">Hapus</button>
+                            </div>
+                        `).join('');
+                        
+                        document.querySelectorAll('.btn-delete-career').forEach(btn => {
+                            btn.addEventListener('click', async (e) => {
+                                if(confirm("Yakin hapus karier ini?")) {
+                                    const id = e.currentTarget.getAttribute('data-id');
+                                    const res = await fetch('/api/content/careers/' + id, { method: 'DELETE' });
+                                    const resData = await res.json();
+                                    if(resData.success) {
+                                        alert("Karier dihapus!");
+                                        location.reload();
+                                    } else {
+                                        alert("Gagal menghapus");
+                                    }
+                                }
+                            });
+                        });
+                    }
+                }
+
                 // Populate Hero Slides
                 const heroGrid = document.getElementById('admin_hero_grid');
                 if(heroGrid && result.data.hero_slides) {
@@ -479,6 +512,41 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             btn.innerHTML = originalText;
             btn.disabled = false;
+        });
+    }
+
+    // Handle Upload Karier Baru
+    const addCareerForm = document.getElementById('add-career-form');
+    if(addCareerForm) {
+        addCareerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('career_title').value;
+            const desc = document.getElementById('career_desc').value;
+            
+            const submitBtn = addCareerForm.querySelector('button[type="submit"]');
+            const oldText = submitBtn.innerText;
+            submitBtn.innerText = "Menyimpan...";
+            submitBtn.disabled = true;
+            
+            try {
+                const res = await fetch('/api/content/careers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description: desc })
+                });
+                const result = await res.json();
+                if(result.success) {
+                    alert("Berhasil menambah karier!");
+                    location.reload();
+                } else {
+                    alert("Gagal: " + result.message);
+                }
+            } catch(e) {
+                alert("Terjadi kesalahan sistem");
+            } finally {
+                submitBtn.innerText = oldText;
+                submitBtn.disabled = false;
+            }
         });
     }
 

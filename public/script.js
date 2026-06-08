@@ -152,6 +152,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                 </div>
             `);
+
+            renderList('careers_container', result.data.careers, item => `
+                <div class="karier-card glass-card">
+                    <div class="karier-icon">💼</div>
+                    <h3>${item.title}</h3>
+                    <p>${item.description}</p>
+                </div>
+            `);
             
             // Render Hero Slides
             if (result.data.hero_slides && result.data.hero_slides.length > 0) {

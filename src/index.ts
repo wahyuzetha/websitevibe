@@ -327,7 +327,27 @@ const app = new Elysia()
     }
     return { success: true };
   })
-
+  .post("/api/content/careers", async ({ body, jwt, cookie: { auth } }: any) => {
+    const token = auth.value;
+    if (!token) return { success: false, message: "Unauthorized" };
+    try { await jwt.verify(token); } catch(e) { return { success: false, message: "Unauthorized" }; }
+    
+    const { title, description } = body as { title: string, description: string };
+    if (!title || !description) return { success: false, message: "Title and description required" };
+    
+    await db.insert(careers).values({ title, description });
+    invalidateCache();
+    return { success: true };
+  })
+  .delete("/api/content/careers/:id", async ({ params, jwt, cookie: { auth } }: any) => {
+    const token = auth.value;
+    if (!token) return { success: false, message: "Unauthorized" };
+    try { await jwt.verify(token); } catch(e) { return { success: false, message: "Unauthorized" }; }
+    
+    await db.delete(careers).where(eq(careers.id, parseInt(params.id)));
+    invalidateCache();
+    return { success: true };
+  })
   .get("/ping", () => ({ status: "ok", message: "pong" }))
   .listen(3000);
 
