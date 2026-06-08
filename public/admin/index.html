@@ -166,6 +166,19 @@
                             <label>List Pembelajaran (Pisahkan dengan koma)</label>
                             <input type="text" id="tentang_list" class="form-control auto-save db-setting">
                         </div>
+                        <div class="form-group" style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+                            <label>Gambar / Logo Jurusan (Opsional)</label>
+                            <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 10px;">
+                                <div id="tentang-logo-preview" style="width: 150px; height: 150px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                    <span style="color: #94a3b8; font-size: 0.9rem;">Belum ada logo</span>
+                                </div>
+                                <div style="flex: 1;">
+                                    <input type="file" id="tentang_logo_input" class="form-control" accept="image/*" style="margin-bottom: 10px;">
+                                    <button id="btn-upload-tentang-logo" class="btn btn-outline" style="width: auto;">Upload Logo Baru</button>
+                                    <p style="font-size: 0.85rem; color: #64748b; margin-top: 10px;">Upload gambar untuk mengganti animasi grafis (SVG) di halaman utama. Disarankan format PNG transparan atau JPG beresolusi baik.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 

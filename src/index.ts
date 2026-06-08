@@ -140,6 +140,33 @@ const app = new Elysia()
     invalidateCache();
     return { success: true };
   })
+  .post("/api/content/tentang_logo", async ({ body, jwt, cookie: { auth } }: any) => {
+    const token = auth.value;
+    if (!token) return { success: false, message: "Unauthorized" };
+    try { await jwt.verify(token); } catch(e) { return { success: false, message: "Unauthorized" }; }
+    
+    const file = body.image as File;
+    if (!file || !file.name) {
+      return { success: false, message: "Pilih file gambar logo terlebih dahulu" };
+    }
+
+    const extension = file.name.split('.').pop();
+    const filename = `tentang_logo_${Date.now()}.${extension}`;
+    const filepath = `public/uploads/tentang/${filename}`;
+    
+    await Bun.write(filepath, file);
+    const imageUrl = `/uploads/tentang/${filename}`;
+    
+    const existing = await db.select().from(settings).where(eq(settings.key, 'tentang_logo'));
+    if (existing.length > 0) {
+      await db.update(settings).set({ value: imageUrl }).where(eq(settings.key, 'tentang_logo'));
+    } else {
+      await db.insert(settings).values({ key: 'tentang_logo', value: imageUrl });
+    }
+    
+    invalidateCache();
+    return { success: true, message: "Logo berhasil diunggah", imageUrl };
+  })
   .post("/api/content/gallery", async ({ body, jwt, cookie: { auth } }: any) => {
     const token = auth.value;
     if (!token) return { success: false, message: "Unauthorized" };

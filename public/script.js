@@ -32,6 +32,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const ul = document.getElementById('tentang_list_ul');
                 if (ul) ul.innerHTML = set.tentang_list.split(',').map(item => `<li><i>✓</i> ${item.trim()}</li>`).join('');
             }
+            if (set.tentang_logo) {
+                const visualContainer = document.querySelector('.tentang-visual');
+                if (visualContainer) {
+                    visualContainer.innerHTML = `<img src="${set.tentang_logo}" alt="Logo Jurusan" loading="lazy" style="width: 100%; height: auto; max-height: 400px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); object-fit: cover;">`;
+                }
+            }
 
             bindText('stat1_val', set.stat1_val);
             const stat1 = document.getElementById('stat1_val');

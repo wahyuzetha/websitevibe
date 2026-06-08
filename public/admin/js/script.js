@@ -174,6 +174,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         input.value = settings[key];
                     }
                 });
+                
+                // Populate Tentang Logo Preview
+                const tentangLogoPreview = document.getElementById('tentang-logo-preview');
+                if (tentangLogoPreview && settings['tentang_logo']) {
+                    tentangLogoPreview.innerHTML = `<img src="${settings['tentang_logo']}" style="width: 100%; height: 100%; object-fit: contain;">`;
+                }
 
                 // Populate Advantages (Placeholder)
                 const advList = document.getElementById('advantages-list');
@@ -473,6 +479,49 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             btn.innerHTML = originalText;
             btn.disabled = false;
+        });
+    }
+
+    // Tentang Logo Upload Listener
+    const btnUploadTentangLogo = document.getElementById('btn-upload-tentang-logo');
+    const inputTentangLogo = document.getElementById('tentang_logo_input');
+    
+    if (btnUploadTentangLogo && inputTentangLogo) {
+        btnUploadTentangLogo.addEventListener('click', async () => {
+            const file = inputTentangLogo.files[0];
+            if (!file) {
+                showToast('Pilih file logo terlebih dahulu');
+                return;
+            }
+            
+            const originalText = btnUploadTentangLogo.innerText;
+            btnUploadTentangLogo.innerText = 'Mengunggah...';
+            btnUploadTentangLogo.disabled = true;
+            
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            try {
+                const res = await fetch('/api/content/tentang_logo', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Logo berhasil diunggah!');
+                    const preview = document.getElementById('tentang-logo-preview');
+                    if(preview) {
+                        preview.innerHTML = `<img src="${data.imageUrl}" style="width: 100%; height: 100%; object-fit: contain;">`;
+                    }
+                } else {
+                    showToast('Gagal mengunggah logo: ' + data.message);
+                }
+            } catch(e) {
+                showToast('Kesalahan jaringan saat mengunggah logo');
+            }
+            
+            btnUploadTentangLogo.innerText = originalText;
+            btnUploadTentangLogo.disabled = false;
         });
     }
 
