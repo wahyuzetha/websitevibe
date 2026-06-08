@@ -36,7 +36,6 @@ export const careers = mysqlTable('careers', {
 export const testimonials = mysqlTable('testimonials', {
   id: int('id').autoincrement().primaryKey(),
   name: varchar('name', { length: 255 }),
-  role: varchar('role', { length: 255 }),
   rating: int('rating').default(5),
   content: text('content')
 });
