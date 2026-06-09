@@ -398,6 +398,27 @@ const app = new Elysia()
     invalidateCache();
     return { success: true };
   })
+  .post("/api/content/faqs", async ({ body, jwt, cookie: { auth } }: any) => {
+    const token = auth.value;
+    if (!token) return { success: false, message: "Unauthorized" };
+    try { await jwt.verify(token); } catch(e) { return { success: false, message: "Unauthorized" }; }
+    
+    const { question, answer } = body as { question: string, answer: string };
+    if (!question || !answer) return { success: false, message: "Question and answer required" };
+    
+    await db.insert(faqs).values({ question, answer });
+    invalidateCache();
+    return { success: true };
+  })
+  .delete("/api/content/faqs/:id", async ({ params, jwt, cookie: { auth } }: any) => {
+    const token = auth.value;
+    if (!token) return { success: false, message: "Unauthorized" };
+    try { await jwt.verify(token); } catch(e) { return { success: false, message: "Unauthorized" }; }
+    
+    await db.delete(faqs).where(eq(faqs.id, parseInt(params.id)));
+    invalidateCache();
+    return { success: true };
+  })
   .get("/api/debug/db", async () => {
     try {
       const res = await db.execute(require('drizzle-orm').sql`SHOW COLUMNS FROM testimonials`);

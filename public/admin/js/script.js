@@ -217,15 +217,38 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                // Populate FAQs (Placeholder)
+                // Populate FAQs
                 const faqsList = document.getElementById('faqs-list');
-                if(faqsList) {
-                    faqsList.innerHTML = result.data.faqs.map(faq => `
-                        <div class="edit-card glass-panel">
-                            <div class="form-group"><label>Pertanyaan</label><input type="text" class="form-control" value="${faq.question}"></div>
-                            <div class="form-group"><label>Jawaban</label><textarea class="form-control" rows="3">${faq.answer}</textarea></div>
-                        </div>
-                    `).join('');
+                if(faqsList && result.data.faqs) {
+                    if (result.data.faqs.length === 0) {
+                        faqsList.innerHTML = '<p class="text-muted">Belum ada FAQ. Silakan tambahkan.</p>';
+                    } else {
+                        faqsList.innerHTML = result.data.faqs.map(faq => `
+                            <div class="edit-card glass-panel" style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div style="flex: 1;">
+                                    <h4 style="margin: 0 0 5px 0;">Q: ${faq.question}</h4>
+                                    <p style="margin: 0; font-size: 0.9em; color: #555;">A: ${faq.answer}</p>
+                                </div>
+                                <button class="btn btn-outline btn-delete-faq" data-id="${faq.id}" style="color: red; border-color: red;">Hapus</button>
+                            </div>
+                        `).join('');
+
+                        document.querySelectorAll('.btn-delete-faq').forEach(btn => {
+                            btn.addEventListener('click', async (e) => {
+                                if(confirm("Yakin hapus FAQ ini?")) {
+                                    const id = e.currentTarget.getAttribute('data-id');
+                                    const res = await fetch('/api/content/faqs/' + id, { method: 'DELETE' });
+                                    const resData = await res.json();
+                                    if(resData.success) {
+                                        showToast("FAQ dihapus!");
+                                        loadContent();
+                                    } else {
+                                        alert("Gagal menghapus");
+                                    }
+                                }
+                            });
+                        });
+                    }
                 }
 
                 // Populate Careers
@@ -704,6 +727,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadContent();
             } else {
                 alert('Gagal menambahkan keunggulan');
+            }
+        });
+    }
+
+    // Submit New FAQ
+    const addFaqForm = document.getElementById('add-faq-form');
+    if (addFaqForm) {
+        addFaqForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const question = document.getElementById('faq_question').value;
+            const answer = document.getElementById('faq_answer').value;
+
+            const res = await fetch('/api/content/faqs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question, answer })
+            });
+
+            if ((await res.json()).success) {
+                showToast('FAQ berhasil ditambahkan!');
+                addFaqForm.reset();
+                loadContent();
+            } else {
+                alert('Gagal menambahkan FAQ');
             }
         });
     }
