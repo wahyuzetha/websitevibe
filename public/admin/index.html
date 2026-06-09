@@ -186,10 +186,29 @@
                 <section id="edit-keunggulan" class="content-section d-none">
                     <div class="section-header">
                         <h2 class="section-title">Edit Keunggulan</h2>
-                        <button class="btn btn-outline">+ Tambah Card</button>
+                    </div>
+                    <div class="form-card glass-panel mb-2">
+                        <h3>Tambah Keunggulan Baru</h3>
+                        <form id="add-advantage-form" class="form-row mt-1">
+                            <div class="form-group" style="flex: 0.5;">
+                                <label>Ikon / Emoji</label>
+                                <input type="text" id="adv_icon" class="form-control" placeholder="⭐" required>
+                            </div>
+                            <div class="form-group" style="flex: 1.5;">
+                                <label>Judul Keunggulan</label>
+                                <input type="text" id="adv_title" class="form-control" placeholder="Fasilitas Modern" required>
+                            </div>
+                            <div class="form-group" style="flex: 2;">
+                                <label>Deskripsi Singkat</label>
+                                <input type="text" id="adv_desc" class="form-control" placeholder="Dilengkapi dengan alat standar industri" required>
+                            </div>
+                            <div class="form-group" style="flex: 0.5; display: flex; align-items: flex-end;">
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">Tambah</button>
+                            </div>
+                        </form>
                     </div>
                     <div class="cards-manager" id="advantages-list">
-                        <!-- Rendered by JS -->
+                        <p style="color: #666;">Memuat data keunggulan...</p>
                     </div>
                 </section>
 

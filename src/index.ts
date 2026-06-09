@@ -377,6 +377,27 @@ const app = new Elysia()
     invalidateCache();
     return { success: true };
   })
+  .post("/api/content/advantages", async ({ body, jwt, cookie: { auth } }: any) => {
+    const token = auth.value;
+    if (!token) return { success: false, message: "Unauthorized" };
+    try { await jwt.verify(token); } catch(e) { return { success: false, message: "Unauthorized" }; }
+    
+    const { icon, title, description } = body as { icon: string, title: string, description: string };
+    if (!title || !description) return { success: false, message: "Title and description required" };
+    
+    await db.insert(advantages).values({ icon: icon || '⭐', title, description });
+    invalidateCache();
+    return { success: true };
+  })
+  .delete("/api/content/advantages/:id", async ({ params, jwt, cookie: { auth } }: any) => {
+    const token = auth.value;
+    if (!token) return { success: false, message: "Unauthorized" };
+    try { await jwt.verify(token); } catch(e) { return { success: false, message: "Unauthorized" }; }
+    
+    await db.delete(advantages).where(eq(advantages.id, parseInt(params.id)));
+    invalidateCache();
+    return { success: true };
+  })
   .get("/api/debug/db", async () => {
     try {
       const res = await db.execute(require('drizzle-orm').sql`SHOW COLUMNS FROM testimonials`);

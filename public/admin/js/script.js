@@ -181,19 +181,41 @@ document.addEventListener('DOMContentLoaded', () => {
                     tentangLogoPreview.innerHTML = `<img src="${settings['tentang_logo']}" style="width: 100%; height: 100%; object-fit: contain;">`;
                 }
 
-                // Populate Advantages (Placeholder)
+                // Populate Advantages
                 const advList = document.getElementById('advantages-list');
-                if(advList) {
-                    advList.innerHTML = result.data.advantages.map(adv => `
-                        <div class="edit-card glass-panel">
-                            <div class="card-drag-handle">☰</div>
-                            <div class="form-row">
-                                <div class="form-group"><label>Icon</label><input type="text" class="form-control" value="${adv.icon}"></div>
-                                <div class="form-group"><label>Judul</label><input type="text" class="form-control" value="${adv.title}"></div>
+                if(advList && result.data.advantages) {
+                    if (result.data.advantages.length === 0) {
+                        advList.innerHTML = '<p class="text-muted">Belum ada keunggulan. Silakan tambahkan.</p>';
+                    } else {
+                        advList.innerHTML = result.data.advantages.map(adv => `
+                            <div class="edit-card glass-panel" style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div style="display: flex; gap: 15px; align-items: center; flex: 1;">
+                                    <div style="font-size: 2rem;">${adv.icon}</div>
+                                    <div>
+                                        <h4 style="margin: 0 0 5px 0;">${adv.title}</h4>
+                                        <p style="margin: 0; font-size: 0.9em; color: #555;">${adv.description}</p>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline btn-delete-adv" data-id="${adv.id}" style="color: red; border-color: red;">Hapus</button>
                             </div>
-                            <div class="form-group"><label>Deskripsi</label><input type="text" class="form-control" value="${adv.description}"></div>
-                        </div>
-                    `).join('');
+                        `).join('');
+
+                        document.querySelectorAll('.btn-delete-adv').forEach(btn => {
+                            btn.addEventListener('click', async (e) => {
+                                if(confirm("Yakin hapus keunggulan ini?")) {
+                                    const id = e.currentTarget.getAttribute('data-id');
+                                    const res = await fetch('/api/content/advantages/' + id, { method: 'DELETE' });
+                                    const resData = await res.json();
+                                    if(resData.success) {
+                                        showToast("Keunggulan dihapus!");
+                                        loadContent();
+                                    } else {
+                                        alert("Gagal menghapus");
+                                    }
+                                }
+                            });
+                        });
+                    }
                 }
 
                 // Populate FAQs (Placeholder)
@@ -660,6 +682,31 @@ document.addEventListener('DOMContentLoaded', () => {
             
             btnUploadTentangLogo.innerText = originalText;
             btnUploadTentangLogo.disabled = false;
+        });
+    }
+
+    // Submit New Advantage
+    const addAdvantageForm = document.getElementById('add-advantage-form');
+    if (addAdvantageForm) {
+        addAdvantageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const icon = document.getElementById('adv_icon').value;
+            const title = document.getElementById('adv_title').value;
+            const description = document.getElementById('adv_desc').value;
+
+            const res = await fetch('/api/content/advantages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ icon, title, description })
+            });
+
+            if ((await res.json()).success) {
+                showToast('Keunggulan berhasil ditambahkan!');
+                addAdvantageForm.reset();
+                loadContent();
+            } else {
+                alert('Gagal menambahkan keunggulan');
+            }
         });
     }
 
