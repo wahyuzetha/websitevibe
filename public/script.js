@@ -90,7 +90,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             renderList('advantages_container', result.data.advantages, item => `
                 <div class="card">
-                    <div class="icon-wrapper">${item.icon}</div>
                     <h3>${item.title}</h3>
                     <p>${item.description}</p>
                 </div>

@@ -190,7 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         advList.innerHTML = result.data.advantages.map(adv => `
                             <div class="edit-card glass-panel" style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                                 <div style="display: flex; gap: 15px; align-items: center; flex: 1;">
-                                    <div style="font-size: 2rem;">${adv.icon}</div>
                                     <div>
                                         <h4 style="margin: 0 0 5px 0;">${adv.title}</h4>
                                         <p style="margin: 0; font-size: 0.9em; color: #555;">${adv.description}</p>
@@ -690,14 +689,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (addAdvantageForm) {
         addAdvantageForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const icon = document.getElementById('adv_icon').value;
             const title = document.getElementById('adv_title').value;
             const description = document.getElementById('adv_desc').value;
 
             const res = await fetch('/api/content/advantages', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ icon, title, description })
+                body: JSON.stringify({ title, description })
             });
 
             if ((await res.json()).success) {
